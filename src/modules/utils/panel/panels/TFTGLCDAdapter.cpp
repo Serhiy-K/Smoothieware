@@ -1,18 +1,18 @@
 /*
- * TFTGLCDAdapter.cpp
- *
- * TFTGLCDAdapter is external adapter based on microcontroller.
- * TFTGLCDAdapter may use color TFT LCD with different chips and different resolutions.
- * Courently it built on STM32F103C8T6 "Blue Pill" board and color TFT LCD (ILI9325) with resolution 320x240.
- * TFTGLCDAdapter uses text screen buffer insted off graphical buffer for other panels.
- * TFTGLCDAdapter has own encoder and may have up to 8 buttons (include encoder button).
- *
- * For use TFTGLCDAdapter you need in config file set "panel.enable" parameter to "true",
- * change "panel.lcd" parameter to "tft_glcd_adapter" and set proper parameters for SPI bus.
- *
- *  Created on: 25-06-2019
- *      Author: Serhiy-K
- */
+* TFTGLCDAdapter.cpp
+*
+* TFTGLCDAdapter is external adapter based on microcontroller.
+* TFTGLCDAdapter may use color TFT LCD with different chips and different resolutions.
+* Courently it built on STM32F103C8T6 "Blue Pill" board and color TFT LCD (ILI9325) with resolution 320x240.
+* TFTGLCDAdapter uses text screen buffer insted off graphical buffer for other panels.
+* TFTGLCDAdapter has own encoder and may have up to 8 buttons (include encoder button).
+*
+* For use TFTGLCDAdapter you need in config file set "panel.enable" parameter to "true",
+* change "panel.lcd" parameter to "tft_glcd_adapter" and set proper parameters for SPI bus.
+*
+*  Created on: 25-06-2019
+*      Author: Serhiy-K
+*/
 
 #include "TFTGLCDAdapter.h"
 
@@ -39,6 +39,10 @@ enum Commands {
     BUZZER,              // beep buzzer
     CONTRAST,            // set contrast
     // Other commands... 0xE0 thru 0xFF
+	GET_LCD_ROW = 0xE0,
+	GET_LCD_COL,
+	CLEAR_BUFFER,
+	REDRAW,
     INIT_ADAPTER= 0xFE,  // Initialize
 };
 
@@ -65,8 +69,12 @@ TFTGLCDAdapter::TFTGLCDAdapter() {
     // contrast override
     contrast = THEKERNEL->config->value(panel_checksum, contrast_checksum)->by_default(180)->as_number();
 
-    framebuffer = (uint8_t *)AHB0.alloc(FBSIZE); // grab some memory from USB_RAM
-    if (framebuffer == NULL) THEKERNEL->streams->printf("Not enough memory available for frame buffer");
+    detect_panel();
+
+    if (panel_present)
+        framebuffer = (uint8_t *)AHB0.alloc(fbsize); // grab some memory from USB_RAM
+    else
+        THEKERNEL->streams->printf("TFT GLCD Adapter not connected");
 }
 
 TFTGLCDAdapter::~TFTGLCDAdapter() {
@@ -74,10 +82,35 @@ TFTGLCDAdapter::~TFTGLCDAdapter() {
     delete this->spi;
     AHB0.dealloc(framebuffer);
 }
+//get real number screen lines from adapter
+uint16_t TFTGLCDAdapter::get_screen_lines()
+{
+    this->cs.set(0);
+    this->spi->write(GET_LCD_ROW);
+    text_lines = this->spi->write(GET_SPI_DATA);
+    this->cs.set(1);
+    if (text_lines < 4) text_lines = 0;
+    return text_lines;
+};
+//get screen resolution and calculate framebuffer size
+void TFTGLCDAdapter::detect_panel()
+{
+    panel_present = 0;
+    if (get_screen_lines()) {
+        this->cs.set(0);
+        this->spi->write(GET_LCD_COL);
+        chars_per_line = (uint16_t)this->spi->write(GET_SPI_DATA);
+        this->cs.set(1);
+        if (chars_per_line < 20)
+            return;
+        fbsize = chars_per_line * text_lines + 2;
+        panel_present = 1;  //screen resolution >= 20x4
+    }
+}
 //clearing screen
 void TFTGLCDAdapter::clear() {
-    memset(framebuffer, ' ', FBSIZE - 2);
-    framebuffer[FBSIZE - 2] = framebuffer[FBSIZE - 1] = 0;
+    memset(framebuffer, ' ', fbsize - 2);
+    framebuffer[fbsize - 2] = framebuffer[fbsize - 1] = 0;
     tx = ty = picBits = gliph_update_cnt = 0;
 }
 //set new text cursor position
@@ -95,72 +128,82 @@ void TFTGLCDAdapter::display() {
 }
 //Init adapter
 void TFTGLCDAdapter::init() {
-    this->cs.set(0);
-    this->spi->write(INIT_ADAPTER);
-    // give adapter time to init
-    safe_delay_ms(100);
-    this->cs.set(1);
+    if (panel_present){
+        this->cs.set(0);
+        this->spi->write(INIT_ADAPTER);
+        this->spi->write(0);    //protocol = Smoothie
+        wait_us(10);
+        this->cs.set(1);
+        // give adapter time to init
+        safe_delay_ms(100);
+    }
 }
 //send text line to buffer
 void TFTGLCDAdapter::write(const char *line, int len) {
-    uint8_t pos = tx + ty * CHARS_PER_LINE;
+    uint8_t pos;
+    pos = tx + ty * chars_per_line;
     for (int i = 0; i < len; ++i) {
         framebuffer[pos++] = line[i];
     }
 }
 //send flags for icons and leds
 void TFTGLCDAdapter::send_pic(const unsigned char *fbstart) {
-    framebuffer[FBSIZE - 2] = picBits & PIC_MASK;
-    framebuffer[FBSIZE - 1] = ledBits & LED_MASK;
+    framebuffer[fbsize - 2] = picBits & PIC_MASK;
+    framebuffer[fbsize - 1] = ledBits & LED_MASK;
     if (gliph_update_cnt) gliph_update_cnt--;
     else                  picBits = 0;
     //send framebuffer to adapter
     this->cs.set(0);
     this->spi->write(LCD_WRITE);
-    for (int x = 0; x < FBSIZE; x++) {
+    for (int x = 0; x < fbsize; x++) {
         this->spi->write(*(fbstart++));
     }
     wait_us(10);
     this->cs.set(1);
 }
-//refreshing screen
+//refreshing screen with 20Hz refresh rate
 void TFTGLCDAdapter::on_refresh(bool now) {
-    int refresh_counts = 0;
-    refresh_counts++;
-    // 10Hz refresh rate
-    if (now || refresh_counts % 2 == 0 ) send_pic(framebuffer);
+    uint8_t refresh_counts = 0;
+    if (panel_present) {
+        refresh_counts ^= 1;
+        if (now || refresh_counts)  send_pic(framebuffer);
+    }
 }
 //set flags for icons
 void TFTGLCDAdapter::bltGlyph(int x, int y, int w, int h, const uint8_t *glyph, int span, int x_offset, int y_offset) {
-    if (w == 80)
-        picBits = 0x01;    //draw logo
-    else {
-        // Update Only every 20 refreshes
-        gliph_update_cnt = 20;
-        switch (x) {
-            case 0:   picBits |= 0x02; break; //draw hotend_on1
-            case 27:  picBits |= 0x04; break; //draw hotend_on2
-            case 55:  picBits |= 0x08; break; //draw hotend_on3
-            case 83:  picBits |= 0x10; break; //draw bed_on
-            case 111: picBits |= 0x20; break; //draw fan_state
+    if (panel_present) {
+        if (w == 80)
+            picBits = 0x01;    //draw logo
+        else {
+            // Update Only every 20 refreshes
+            gliph_update_cnt = 20;
+            switch (x) {
+                case 0:   picBits |= 0x02; break; //draw hotend_on1
+                case 27:  picBits |= 0x04; break; //draw hotend_on2
+                case 55:  picBits |= 0x08; break; //draw hotend_on3
+                case 83:  picBits |= 0x10; break; //draw bed_on
+                case 111: picBits |= 0x20; break; //draw fan_state
+            }
         }
     }
 }
 // Sets flags for leds
 void TFTGLCDAdapter::setLed(int led, bool onoff) {
-    if(onoff) {
-        switch(led) {
-            case LED_HOTEND_ON: ledBits |= 1; break; // on
-            case LED_BED_ON:    ledBits |= 2; break; // on
-            case LED_FAN_ON:    ledBits |= 4; break; // on
-            case LED_HOT:       ledBits |= 8; break; // on
-        }
-    } else {
-        switch(led) {
-            case LED_HOTEND_ON: ledBits &= ~1; break; // off
-            case LED_BED_ON:    ledBits &= ~2; break; // off
-            case LED_FAN_ON:    ledBits &= ~4; break; // off
-            case LED_HOT:       ledBits &= ~8; break; // off
+    if (panel_present) {
+        if(onoff) {
+            switch(led) {
+                case LED_HOTEND_ON: ledBits |= 1; break; // on
+                case LED_BED_ON:    ledBits |= 2; break; // on
+                case LED_FAN_ON:    ledBits |= 4; break; // on
+                case LED_HOT:       ledBits |= 8; break; // on
+            }
+        } else {
+            switch(led) {
+                case LED_HOTEND_ON: ledBits &= ~1; break; // off
+                case LED_BED_ON:    ledBits &= ~2; break; // off
+                case LED_FAN_ON:    ledBits &= ~4; break; // off
+                case LED_HOT:       ledBits &= ~8; break; // off
+            }
         }
     }
 }
@@ -177,42 +220,55 @@ void TFTGLCDAdapter::buzz(long duration, uint16_t freq) {
             wait_us(period / 2);
             elapsed_time += (period);
         }
-    } else { //buzzer on GLCD controller board
+    } else if (panel_present) {    //buzzer on GLCD controller board
         this->cs.set(0);
         this->spi->write(BUZZER);
+        this->spi->write((uint16_t)duration >> 8);
+        this->spi->write(duration);
+        this->spi->write(freq >> 8);
+        this->spi->write(freq);
         safe_delay_us(10);
         this->cs.set(1);
+        safe_delay_us(50);
     }
 }
 //reading button state
 uint8_t TFTGLCDAdapter::readButtons(void) {
-    this->cs.set(0);
-    this->spi->write(READ_BUTTONS);
-    safe_delay_us(10);
-    uint8_t b = this->spi->write(GET_SPI_DATA);
-    safe_delay_us(10);
-    this->cs.set(1);
-    return b;
+    if (panel_present) {
+        this->cs.set(0);
+        this->spi->write(READ_BUTTONS);
+        safe_delay_us(10);
+        uint8_t b = this->spi->write(GET_SPI_DATA);
+        safe_delay_us(10);
+        this->cs.set(1);
+        return b;
+    }
+    else return 0;
 }
 
 int TFTGLCDAdapter::readEncoderDelta() {
-    this->cs.set(0);
-    this->spi->write(READ_ENCODER);
-    safe_delay_us(10);
-    int8_t e = this->spi->write(GET_SPI_DATA);
-    safe_delay_us(10);
-    this->cs.set(1);
-    int d = (int16_t)e;
-    return d;
+    if (panel_present) {
+        this->cs.set(0);
+        this->spi->write(READ_ENCODER);
+        safe_delay_us(10);
+        int8_t e = this->spi->write(GET_SPI_DATA);
+        safe_delay_us(10);
+        this->cs.set(1);
+        int d = (int16_t)e;
+        return d;
+    }
+    else return 0;
 }
 
 void TFTGLCDAdapter::setContrast(uint8_t c) {
     contrast = c;
-    this->cs.set(0);
-    this->spi->write(CONTRAST);
-    safe_delay_us(10);
-    this->spi->write(c);
-    safe_delay_us(10);
-    this->cs.set(1);
+    if (panel_present) {
+        this->cs.set(0);
+        this->spi->write(CONTRAST);
+        safe_delay_us(10);
+        this->spi->write(c);
+        safe_delay_us(10);
+        this->cs.set(1);
+    }
 }
 

@@ -12,9 +12,6 @@
 #include "mbed.h"
 #include "libs/Pin.h"
 
-#define    CHARS_PER_LINE    20    //as for other panels
-#define    TEXT_LINES        10
-
 class TFTGLCDAdapter: public LcdBase {
 
 public:
@@ -34,7 +31,7 @@ public:
     int readEncoderDelta();
 
     int getEncoderResolution() { return 2; }
-    uint16_t get_screen_lines() { return TEXT_LINES; }
+    uint16_t get_screen_lines();// { return TEXT_LINES; }
     bool hasGraphics() { return true; }
     bool hasFullGraphics()  { return false; }
 
@@ -55,6 +52,7 @@ public:
 private:
     // this is a C++ way to do something on entry of a class and something else on exit of scope
     void wait_until_ready();
+    void detect_panel();
 
     //buffer
     unsigned char *framebuffer;
@@ -63,11 +61,15 @@ private:
     Pin cs;
     Pin buzz_pin;
 
+    uint16_t text_lines;    //minimum 4
+    uint8_t chars_per_line; //minimum 20
+    uint16_t fbsize;
     uint8_t tx, ty;    // text cursor position
     uint8_t picBits;
     uint8_t ledBits;
     uint8_t contrast;
     uint8_t gliph_update_cnt;
+    uint8_t panel_present;
 };
 
 #endif /* TFTGLCDAdapter_H_ */
