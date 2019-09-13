@@ -20,7 +20,7 @@ public:
     void init();
     void home();
     void clear();
-    void display();
+    void display(){}; //nothing
     void setCursor(uint8_t col, uint8_t row);
     void write(const char* line, int len);
     bool encoderReturnsDelta() { return true; }
@@ -31,12 +31,9 @@ public:
     int readEncoderDelta();
 
     int getEncoderResolution() { return 2; }
-    uint16_t get_screen_lines();// { return TEXT_LINES; }
+    uint16_t get_screen_lines() { return text_lines; };    // return real number of panel screen lines
     bool hasGraphics() { return true; }
     bool hasFullGraphics()  { return false; }
-
-    //send text buffer to screen
-    void send_pic(const unsigned char* data);
 
     // blit a glyph of w pixels wide and h pixels high to x, y. offset pixel position in glyph by x_offset, y_offset.
     // span is the width in bytes of the src bitmap
@@ -51,8 +48,8 @@ public:
 
 private:
     // this is a C++ way to do something on entry of a class and something else on exit of scope
-    void wait_until_ready();
     void detect_panel();
+    void send_pic(const unsigned char* data);   //send text buffer to screen
 
     //buffer
     unsigned char *framebuffer;
@@ -61,15 +58,16 @@ private:
     Pin cs;
     Pin buzz_pin;
 
-    uint16_t text_lines;    //minimum 4
+    uint16_t text_lines;    //minimum 10
     uint8_t chars_per_line; //minimum 20
     uint16_t fbsize;
-    uint8_t tx, ty;    // text cursor position
+    uint8_t tx, ty;         // text cursor position
     uint8_t picBits;
     uint8_t ledBits;
     uint8_t contrast;
     uint8_t gliph_update_cnt;
-    uint8_t panel_present;
+    uint8_t panel_present = 0;
+    uint8_t refresh_counts = 0;
 };
 
 #endif /* TFTGLCDAdapter_H_ */
