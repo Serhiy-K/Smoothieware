@@ -46,6 +46,7 @@ private:
         bool issue_change_speed:1;
         bool has_fan:1;
         bool fan_state:1;
+        uint16_t fan_speed = 0;
     };
 };
 

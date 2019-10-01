@@ -118,6 +118,9 @@ void WatchScreen::on_refresh()
             THEPANEL->reset_counter();
         }
 
+        if (THEPANEL->max_screen_lines() >= 10)
+            THEPANEL->lcd->set_fan_percent(this->has_fan, (this->fan_speed * 100) / 255);
+
         this->redraw();
 
         // for LCDs with leds set them according to heater status
@@ -395,7 +398,7 @@ void WatchScreen::draw_graphics()
     THEPANEL->lcd->setCursorPX(x + icon_width + 1, y);
     THEPANEL->lcd->printf("%d%%", this->current_speed);
     row++;
-    
+
     if (THEPANEL->is_playing()) {
         // Print the elapsed print time
         y = 11 + (row * (icon_height + 1));

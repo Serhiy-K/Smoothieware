@@ -23,17 +23,18 @@ public:
     void display(){}; //nothing
     void setCursor(uint8_t col, uint8_t row);
     void write(const char* line, int len);
-    bool encoderReturnsDelta() { return true; }
+    bool encoderReturnsDelta() { return true; };
+    void set_fan_percent(bool hasfan, uint16_t percent) { has_fan = hasfan; fan_percent = percent; };
 
     void on_refresh(bool now=false);
 
     uint8_t readButtons();
     int readEncoderDelta();
 
-    int getEncoderResolution() { return 2; }
+    int getEncoderResolution() { return 2; };
     uint16_t get_screen_lines() { return text_lines; };    // return real number of panel screen lines
     bool hasGraphics() { return true; }
-    bool hasFullGraphics()  { return false; }
+    bool hasFullGraphics()  { return false; };
 
     // blit a glyph of w pixels wide and h pixels high to x, y. offset pixel position in glyph by x_offset, y_offset.
     // span is the width in bytes of the src bitmap
@@ -41,7 +42,7 @@ public:
     void bltGlyph(int x, int y, int w, int h, const uint8_t *glyph, int span= 0, int x_offset=0, int y_offset=0);
     void setLed(int led, bool onoff);
 
-    uint8_t getContrast() { return contrast; }
+    uint8_t getContrast() { return contrast; };
     void setContrast(uint8_t c);
 
     void buzz(long duration, uint16_t freq);
@@ -68,6 +69,8 @@ private:
     uint8_t gliph_update_cnt;
     uint8_t panel_present = 0;
     uint8_t refresh_counts = 0;
+    bool has_fan = 0;
+    uint16_t fan_percent = 0;
 };
 
 #endif /* TFTGLCDAdapter_H_ */
