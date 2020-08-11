@@ -56,8 +56,10 @@ class LcdBase {
         virtual bool hasFullGraphics() { return false; }     // Temporary. Remove this once RRDGLCD has more graphics functions implemented.
         virtual bool encoderReturnsDelta() { return false; } // set to true if the panel handles encoder clicks and returns a delta
         virtual uint8_t getContrast() { return 0; }
-        virtual void setContrast(uint8_t c) { }
-        virtual void set_fan_percent(bool hasfan, uint16_t percent){};  //for panels with own controller
+        virtual void setContrast(uint8_t c) {}
+        virtual void set_fan_percent(uint16_t percent){};
+        virtual void set_has_fan(bool has_fan){};
+
 
         // Graphics Functions
         // on graphics panels, the input bitmap is in X windows XBM format but

@@ -148,8 +148,10 @@ void TFTGLCDAdapter::send_pic(const unsigned char *fbstart) {
     framebuffer[fbsize - 1] = ledBits & LED_MASK;
     if (gliph_update_cnt) gliph_update_cnt--;
     else                  picBits = 0;
-    if ((framebuffer[20] == 'X') && (this->has_fan == true))  //main screen, fan present
-        framebuffer[chars_per_line * 4] = (uint8_t)fan_percent;
+    if ((framebuffer[chars_per_line] == 'X') && (this->has_fan == true)) {  //main screen, fan present
+        framebuffer[chars_per_line * 4] = '%';
+        framebuffer[chars_per_line * 4 + 1] = (uint8_t)fan_percent;
+    }
     //send framebuffer to adapter
     this->cs.set(0);
     this->spi->write(LCD_WRITE);

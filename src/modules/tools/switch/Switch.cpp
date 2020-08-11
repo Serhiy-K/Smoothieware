@@ -22,6 +22,9 @@
 #include "StreamOutput.h"
 #include "StreamOutputPool.h"
 
+#include "Panel.h"
+#include "LcdBase.h"
+
 #include "PwmOut.h"
 
 #include "MRI_Hooks.h"
@@ -45,6 +48,7 @@
 #define    output_off_command_checksum  CHECKSUM("output_off_command")
 #define    pwm_period_ms_checksum       CHECKSUM("pwm_period_ms")
 #define    failsafe_checksum            CHECKSUM("failsafe_set_to")
+#define    halt_setting_checksum        CHECKSUM("halt_set_to")
 #define    ignore_onhalt_checksum       CHECKSUM("ignore_on_halt")
 
 #define ROUND2DP(x) (roundf(x * 1e2F) / 1e2F)
@@ -65,8 +69,8 @@ void Switch::on_halt(void *arg)
 
         // set pin to failsafe value
         switch(this->output_type) {
-            case DIGITAL: this->digital_pin->set(this->failsafe); break;
-            case SIGMADELTA: this->sigmadelta_pin->set(this->failsafe); break;
+            case DIGITAL: this->digital_pin->set(this->haltsetting); break;
+            case SIGMADELTA: this->sigmadelta_pin->set(this->haltsetting); break;
             case HWPWM: this->pwm_pin->write(switch_value/100.0F); break;
             case SWPWM: this->swpwm_pin->write(switch_value/100.0F); break;
             case NONE: return;
@@ -121,6 +125,7 @@ void Switch::on_config_reload(void *argument)
         string type = THEKERNEL->config->value(switch_checksum, this->name_checksum, output_type_checksum )->by_default("pwm")->as_string();
         this->failsafe= THEKERNEL->config->value(switch_checksum, this->name_checksum, failsafe_checksum )->by_default(0)->as_number();
         this->ignore_on_halt= THEKERNEL->config->value(switch_checksum, this->name_checksum, ignore_onhalt_checksum )->by_default(false)->as_bool();
+        this->haltsetting= THEKERNEL->config->value(switch_checksum, this->name_checksum, halt_setting_checksum )->by_default(false)->as_bool();
 
         if(type == "pwm"){
             this->output_type= SIGMADELTA;
@@ -166,7 +171,7 @@ void Switch::on_config_reload(void *argument)
             }
             delete pin;
             if(this->pwm_pin == nullptr) {
-                THEKERNEL->streams->printf("Selected Switch output pin is not PWM capable - disabled");
+                printf("Selected Switch output pin is not PWM capable - disabled\n");
                 this->output_type= NONE;
             }
 
@@ -193,7 +198,11 @@ void Switch::on_config_reload(void *argument)
         this->output_type= NONE;
         // set to initial state
         this->input_pin_state = this->input_pin->get();
-        // input pin polling
+        if(this->input_pin_behavior == momentary_checksum) {
+            // initialize switch state to same as current pin level
+            this->switch_state = this->input_pin_state;
+        }
+          // input pin polling
         THEKERNEL->slow_ticker->attach( 100, this, &Switch::pinpoll_tick);
     }
 
@@ -303,6 +312,10 @@ void Switch::on_gcode_received(void *argument)
     // issuing redundant swicth on calls regularly we need to optimize by making sure the value is actually changing
     // hence we need to do the wait for queue in each case rather than just once at the start
     if(match_input_on_gcode(gcode)) {
+
+        if (THEPANEL->max_screen_lines() >= 10)
+            THEPANEL->lcd->set_fan_percent((uint16_t)(gcode->get_value('S') * 100 / 255));
+
         if (this->output_type == SIGMADELTA) {
             // SIGMADELTA output pin turn on (or off if S0)
             if(gcode->has_letter('S')) {

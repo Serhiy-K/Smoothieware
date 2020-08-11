@@ -24,7 +24,8 @@ public:
     void setCursor(uint8_t col, uint8_t row);
     void write(const char* line, int len);
     bool encoderReturnsDelta() { return true; };
-    void set_fan_percent(bool hasfan, uint16_t percent) { has_fan = hasfan; fan_percent = percent; };
+    void set_fan_percent(uint16_t percent) { fan_percent = percent; };
+    void set_has_fan(bool present){ has_fan = present; };
 
     void on_refresh(bool now=false);
 

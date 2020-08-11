@@ -118,9 +118,6 @@ void WatchScreen::on_refresh()
             THEPANEL->reset_counter();
         }
 
-        if (THEPANEL->max_screen_lines() >= 10)
-            THEPANEL->lcd->set_fan_percent(this->has_fan, (this->fan_speed * 100) / 255);
-
         this->redraw();
 
         // for LCDs with leds set them according to heater status
@@ -188,6 +185,7 @@ void WatchScreen::get_current_status()
         this->has_fan = false;
         this->fan_state = false;
     }
+    THEPANEL->lcd->set_has_fan(this->has_fan);
 }
 
 // fetch the data we are displaying
