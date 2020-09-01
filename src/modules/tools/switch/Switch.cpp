@@ -202,7 +202,7 @@ void Switch::on_config_reload(void *argument)
             // initialize switch state to same as current pin level
             this->switch_state = this->input_pin_state;
         }
-          // input pin polling
+        // input pin polling
         THEKERNEL->slow_ticker->attach( 100, this, &Switch::pinpoll_tick);
     }
 
