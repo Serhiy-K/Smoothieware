@@ -60,6 +60,7 @@ Kernel::Kernel()
     feed_hold = false;
     enable_feed_hold = false;
     bad_mcu= true;
+    stop_request= false;
 
     instance = this; // setup the Singleton instance of the kernel
 
@@ -213,7 +214,7 @@ std::string Kernel::get_query_string()
         // deal with the ABC axis (E will be A)
         for (int i = A_AXIS; i < robot->get_number_registered_motors(); ++i) {
             // current actuator position
-            n = snprintf(buf, sizeof(buf), ",%1.4f", robot->from_millimeters(robot->actuators[i]->get_current_position()));
+            n = snprintf(buf, sizeof(buf), ",%1.4f", robot->actuators[i]->get_current_position());
             if(n > sizeof(buf)) n= sizeof(buf);
             str.append(buf, n);
         }
@@ -264,7 +265,7 @@ std::string Kernel::get_query_string()
         // deal with the ABC axis (E will be A)
         for (int i = A_AXIS; i < robot->get_number_registered_motors(); ++i) {
             // current actuator position
-            n = snprintf(buf, sizeof(buf), ",%1.4f", robot->from_millimeters(robot->actuators[i]->get_current_position()));
+            n = snprintf(buf, sizeof(buf), ",%1.4f", robot->actuators[i]->get_current_position());
             if(n > sizeof(buf)) n= sizeof(buf);
             str.append(buf, n);
         }
@@ -314,6 +315,16 @@ void Kernel::add_module(Module* module)
 void Kernel::register_for_event(_EVENT_ENUM id_event, Module *mod)
 {
     this->hooks[id_event].push_back(mod);
+}
+
+// This will stop the que and stop further commands, and stop motors
+// Optionally used before on_halt() is sent to do a quick stop
+// May be called from an ISR
+void Kernel::immediate_halt()
+{
+    this->halted = true;
+    conveyor->flush_queue(); // make sure no queued up codes get through
+    for(auto &a : robot->actuators) a->stop_moving();
 }
 
 // Call a specific event with an argument
