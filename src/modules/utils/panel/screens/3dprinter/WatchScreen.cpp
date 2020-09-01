@@ -185,6 +185,7 @@ void WatchScreen::get_current_status()
         this->has_fan = false;
         this->fan_state = false;
     }
+    THEPANEL->lcd->set_has_fan(this->has_fan);
 }
 
 // fetch the data we are displaying
@@ -395,7 +396,7 @@ void WatchScreen::draw_graphics()
     THEPANEL->lcd->setCursorPX(x + icon_width + 1, y);
     THEPANEL->lcd->printf("%d%%", this->current_speed);
     row++;
-    
+
     if (THEPANEL->is_playing()) {
         // Print the elapsed print time
         y = 11 + (row * (icon_height + 1));

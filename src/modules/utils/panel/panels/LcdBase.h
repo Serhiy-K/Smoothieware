@@ -56,7 +56,10 @@ class LcdBase {
         virtual bool hasFullGraphics() { return false; }     // Temporary. Remove this once RRDGLCD has more graphics functions implemented.
         virtual bool encoderReturnsDelta() { return false; } // set to true if the panel handles encoder clicks and returns a delta
         virtual uint8_t getContrast() { return 0; }
-        virtual void setContrast(uint8_t c) { }
+        virtual void setContrast(uint8_t c) {}
+        virtual void set_fan_percent(uint16_t percent){};
+        virtual void set_has_fan(bool has_fan){};
+
 
         // Graphics Functions
         // on graphics panels, the input bitmap is in X windows XBM format but
@@ -67,15 +70,15 @@ class LcdBase {
         /**
          * Sets the exact position of the text cursor on graphical displays. Takes the coordinates of the top left
          * of the next character to be printed. Not used for text-only displays.
-         * 
+         *
          * @param x X coordinate
          * @param y Y coordinate
          */
         virtual void setCursorPX(int x, int y) {};
 
         /**
-         * Sets the mode used for drawing the foreground when printing text. 
-         * 
+         * Sets the mode used for drawing the foreground when printing text.
+         *
          * @param c 0: Turn pixels off (AND logic)
          *          1: Turn pixels on (OR logic) (default)
          *          2: Invert pixels (XOR logic)
@@ -85,14 +88,14 @@ class LcdBase {
         /**
         * Turns on/off drawing the background behind text. If on, the background color will be the inverse of the text color.
         * If off the background will be transparent. Defaults to on.
-        * 
+        *
         * @param bg True: Background on (default), False: Background off (transparent)
         */
         virtual void setBackground(bool bg) {};
 
         /**
          * Turns on/off a specific pixel on the display. The screen origin (0,0) is at the top left of the display.
-         * 
+         *
          * @param x X coordinate
          * @param y Y coordinate
          * @param color Mode to use for drawing the pixel (see setColor() for options)
@@ -101,7 +104,7 @@ class LcdBase {
 
         /**
          * Draws a horizontal line.
-         * 
+         *
          * @param x X coordinate of start of line
          * @param y Y coordinate of start of line
          * @param w Width of the line
@@ -111,7 +114,7 @@ class LcdBase {
 
         /**
          * Draws a vertical line.
-         * 
+         *
          * @param x X coordinate of start of line
          * @param y Y coordinate of start of line
          * @param h Height of the line
@@ -121,7 +124,7 @@ class LcdBase {
 
         /**
          * Draws a filled rectangle.
-         * 
+         *
          * @param x X coordinate of left side
          * @param y Y coordinate of top
          * @param w Width of rectangle

@@ -22,6 +22,9 @@
 #include "StreamOutput.h"
 #include "StreamOutputPool.h"
 
+#include "Panel.h"
+#include "LcdBase.h"
+
 #include "PwmOut.h"
 
 #include "MRI_Hooks.h"
@@ -309,6 +312,10 @@ void Switch::on_gcode_received(void *argument)
     // issuing redundant swicth on calls regularly we need to optimize by making sure the value is actually changing
     // hence we need to do the wait for queue in each case rather than just once at the start
     if(match_input_on_gcode(gcode)) {
+
+        if (THEPANEL->max_screen_lines() >= 10)
+            THEPANEL->lcd->set_fan_percent((uint16_t)(gcode->get_value('S') * 100 / 255));
+
         if (this->output_type == SIGMADELTA) {
             // SIGMADELTA output pin turn on (or off if S0)
             if(gcode->has_letter('S')) {

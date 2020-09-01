@@ -30,6 +30,7 @@
 #include "panels/ReprapDiscountGLCD.h"
 #include "panels/ST7565.h"
 #include "panels/UniversalAdapter.h"
+#include "panels/TFTGLCDAdapter.h"
 
 #include "version.h"
 #include "checksumm.h"
@@ -50,6 +51,7 @@
 #define mini_viki2_checksum        CHECKSUM("mini_viki2")
 #define universal_adapter_checksum CHECKSUM("universal_adapter")
 #define sh1106_oled_checksum      CHECKSUM("sh1106_oled")
+#define tft_glcd_adapter_checksum  CHECKSUM("tft_glcd_adapter")
 
 #define menu_offset_checksum        CHECKSUM("menu_offset")
 #define encoder_resolution_checksum CHECKSUM("encoder_resolution")
@@ -131,6 +133,8 @@ void Panel::on_module_loaded()
         this->lcd = new UniversalAdapter();
     } else if (lcd_cksm == sh1106_oled_checksum) {
         this->lcd = new ST7565(4); // variant 4
+    } else if (lcd_cksm == tft_glcd_adapter_checksum) {
+        this->lcd = new TFTGLCDAdapter();
     } else {
         // no known lcd type defined
         delete this;
