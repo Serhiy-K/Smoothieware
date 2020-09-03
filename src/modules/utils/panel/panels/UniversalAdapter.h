@@ -23,7 +23,7 @@ class UniversalAdapter : public LcdBase {
         void setCursor(uint8_t col, uint8_t row);
         void init();
         void write(const char* line, int len);
-        bool encoderReturnsDelta() { return true; }
+        bool encoderReturnsDelta() { return true; };
         //void on_refresh(bool now);
 
         void setLed(int led, bool onoff);
@@ -32,9 +32,11 @@ class UniversalAdapter : public LcdBase {
         int readEncoderDelta();
 
         // this is the number of clicks per detent
-        int getEncoderResolution() { return 2; }
+        int getEncoderResolution() { return 2; };
 
         void buzz(long,uint16_t);
+
+        void set_fan_percent(uint16_t percent) { fan_percent = percent; };
 
     private:
         // this is a C++ way to do something on entry of a class and something else on exit of scope
@@ -53,6 +55,7 @@ class UniversalAdapter : public LcdBase {
         mbed::SPI* spi;
         Pin *cs_pin;
         Pin *busy_pin;
+        uint16_t fan_percent = 0;
 };
 
 

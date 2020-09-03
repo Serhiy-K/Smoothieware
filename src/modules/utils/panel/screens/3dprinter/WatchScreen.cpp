@@ -185,7 +185,6 @@ void WatchScreen::get_current_status()
         this->has_fan = false;
         this->fan_state = false;
     }
-    THEPANEL->lcd->set_has_fan(this->has_fan);
 }
 
 // fetch the data we are displaying

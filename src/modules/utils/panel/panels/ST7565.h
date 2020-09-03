@@ -62,6 +62,8 @@ public:
     void buzz(long duration, uint16_t freq);
     void setLed(int led, bool onoff);
 
+    void set_fan_percent(uint16_t percent) { fan_percent = percent; };
+
 private:
 
     //buffer
@@ -84,6 +86,7 @@ private:
     uint8_t tx, ty;
     uint8_t text_color = 1;
     uint8_t contrast;
+    uint16_t fan_percent = 0;
     struct {
         bool reversed:1;
         bool is_viki2:1;

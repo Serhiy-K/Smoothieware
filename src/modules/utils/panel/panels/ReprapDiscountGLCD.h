@@ -35,11 +35,13 @@ class ReprapDiscountGLCD : public LcdBase {
         // The glyph bytes will be 8 bits of X pixels, msbit->lsbit from top left to bottom right
         void bltGlyph(int x, int y, int w, int h, const uint8_t *glyph, int span= 0, int x_offset=0, int y_offset=0);
         void on_refresh(bool now=false);
+        void set_fan_percent(uint16_t percent) { fan_percent = percent; };
 
     private:
         RrdGlcd* glcd;
         uint8_t col;
         uint8_t row;
+        uint16_t fan_percent = 0;
 
         Pin spi_cs_pin;
         Pin encoder_a_pin;

@@ -313,8 +313,7 @@ void Switch::on_gcode_received(void *argument)
     // hence we need to do the wait for queue in each case rather than just once at the start
     if(match_input_on_gcode(gcode)) {
 
-        if (THEPANEL->max_screen_lines() >= 10)
-            THEPANEL->lcd->set_fan_percent((uint16_t)(gcode->get_value('S') * 100 / 255));
+        THEPANEL->lcd->set_fan_percent((uint16_t)(gcode->get_value('S') * 100 / 255));
 
         if (this->output_type == SIGMADELTA) {
             // SIGMADELTA output pin turn on (or off if S0)

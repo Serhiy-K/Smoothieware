@@ -24,18 +24,14 @@ public:
     void setCursor(uint8_t col, uint8_t row);
     void write(const char* line, int len);
     bool encoderReturnsDelta() { return true; };
-    void set_fan_percent(uint16_t percent) { fan_percent = percent; };
-    void set_has_fan(bool present){ has_fan = present; };
-
-    void on_refresh(bool now=false);
-
+    void on_refresh(bool now = false);
     uint8_t readButtons();
     int readEncoderDelta();
-
     int getEncoderResolution() { return 2; };
     uint16_t get_screen_lines() { return text_lines; };    // return real number of panel screen lines
-    bool hasGraphics() { return true; }
+    bool hasGraphics() { return true; };
     bool hasFullGraphics()  { return false; };
+    void set_fan_percent(uint16_t percent) { fan_percent = percent; };
 
     // blit a glyph of w pixels wide and h pixels high to x, y. offset pixel position in glyph by x_offset, y_offset.
     // span is the width in bytes of the src bitmap
@@ -70,7 +66,6 @@ private:
     uint8_t gliph_update_cnt;
     uint8_t panel_present = 0;
     uint8_t refresh_counts = 0;
-    bool has_fan = 0;
     uint16_t fan_percent = 0;
 };
 
