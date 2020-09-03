@@ -24,9 +24,9 @@ mm_max_arc_error                             0.01             # The maximum erro
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
 # See http://smoothieware.org/stepper-motors
-alpha_steps_per_mm                           800              # Steps per mm for alpha ( X ) stepper: 16 teeth * 2Ð¼Ð¼, 200 steps, microstep = 1/128 
+alpha_steps_per_mm                           800              # Steps per mm for alpha ( X ) stepper: 16 teeth * 2ìì, 200 steps, microstep = 1/128 
 beta_steps_per_mm                            800              # Steps per mm for beta ( Y ) stepper
-gamma_steps_per_mm                           2560             # Steps per mm for gamma ( Z ) stepper: Ðœ8 step=1.25mm, 200 steps, microstep = 1/16
+gamma_steps_per_mm                           2560             # Steps per mm for gamma ( Z ) stepper: Ì8 step=1.25mm, 200 steps, microstep = 1/16
 
 # Planner module configuration : Look-ahead and acceleration configuration
 # See http://smoothieware.org/motion-control
@@ -42,7 +42,7 @@ z_axis_max_speed                             300              # Maximum speed in
 
 # Stepper module configuration 
 # Pins are defined as  ports, and pin numbers, appending "!" to the number will invert a pin
-#ï¿½See http://smoothieware.org/pin-configuration and http://smoothieware.org/pinout
+# See http://smoothieware.org/pin-configuration and http://smoothieware.org/pinout
 alpha_step_pin                               2.0              # Pin for alpha stepper step signal
 alpha_dir_pin                                1.9!             # Pin for alpha stepper direction, add '!' to reverse direction
 alpha_en_pin                                 1.8              # Pin for alpha enable pin
@@ -60,62 +60,61 @@ gamma_max_rate                               300.0            # Maximum rate in 
 
 ## Extruder module configuration
 # See http://smoothieware.org/extruder
-extruder.hotend.enable                          true          # Whether to activate the extruder module at all. All configuration is ignored if false
-extruder.hotend.steps_per_mm                    88            # Steps per mm for extruder stepper
-extruder.hotend.default_feed_rate               360           # Default rate ( mm/minute ) for moves where only the extruder moves
-extruder.hotend.acceleration                    500           # Acceleration for the stepper motor mm/sec?
-extruder.hotend.max_speed                       50            # Maximum speed in mm/s
+extruder.hotend.enable                        true           # Whether to activate the extruder module at all. All configuration is ignored if false
+extruder.hotend.steps_per_mm                  88             # Steps per mm for extruder stepper
+extruder.hotend.default_feed_rate             360            # Default rate ( mm/minute ) for moves where only the extruder moves
+extruder.hotend.acceleration                  500            # Acceleration for the stepper motor mm/sec?
+extruder.hotend.max_speed                     50             # Maximum speed in mm/s
 
-extruder.hotend.step_pin                        2.3           # Pin for extruder step signal
-extruder.hotend.dir_pin                         1.15          # Pin for extruder dir signal ( add '!' to reverse direction )
-extruder.hotend.en_pin                          1.8           # Pin for extruder enable signal
+extruder.hotend.step_pin                      2.3            # Pin for extruder step signal
+extruder.hotend.dir_pin                       1.15           # Pin for extruder dir signal ( add '!' to reverse direction )
+extruder.hotend.en_pin                        1.8            # Pin for extruder enable signal
 
 # Extruder offset
-#extruder.hotend.x_offset                        0            # X offset from origin in mm
-#extruder.hotend.y_offset                        0            # Y offset from origin in mm
-#extruder.hotend.z_offset                        0            # Z offset from origin in mm
+#extruder.hotend.x_offset                     0              # X offset from origin in mm
+#extruder.hotend.y_offset                     0              # Y offset from origin in mm
+#extruder.hotend.z_offset                     0              # Z offset from origin in mm
 
 # Firmware retract settings when using G10/G11, these are the defaults if not defined, must be defined for each extruder if not using the defaults
-#extruder.hotend.retract_length                  3            # Retract length in mm
-#extruder.hotend.retract_feedrate                45           # Retract feedrate in mm/sec
-#extruder.hotend.retract_recover_length          0            # Additional length for recover
-#extruder.hotend.retract_recover_feedrate        8            # Recover feedrate in mm/sec (should be less than retract feedrate)
-#extruder.hotend.retract_zlift_length            0            # Z-lift on retract in mm, 0 disables
-#extruder.hotend.retract_zlift_feedrate          6000         # Z-lift feedrate in mm/min (Note mm/min NOT mm/sec)
+#extruder.hotend.retract_length               3              # Retract length in mm
+#extruder.hotend.retract_feedrate             45             # Retract feedrate in mm/sec
+#extruder.hotend.retract_recover_length       0              # Additional length for recover
+#extruder.hotend.retract_recover_feedrate     8              # Recover feedrate in mm/sec (should be less than retract feedrate)
+#extruder.hotend.retract_zlift_length         0              # Z-lift on retract in mm, 0 disables
+#extruder.hotend.retract_zlift_feedrate       6000           # Z-lift feedrate in mm/min (Note mm/min NOT mm/sec)
 
-#delta_current                                   1.5          # First extruder stepper motor current
+#delta_current                                1.5            # First extruder stepper motor current
 
 # Second extruder module configuration
-extruder.hotend2.enable                         false        # Whether to activate the extruder module at all. All configuration is ignored if false
-extruder.hotend2.steps_per_mm                   88           # Steps per mm for extruder stepper
-extruder.hotend2.default_feed_rate              360          # Default rate ( mm/minute ) for moves where only the extruder moves
-extruder.hotend2.acceleration                   500          # Acceleration for the stepper motor, as of 0.6, arbitrary ratio
-extruder.hotend2.max_speed                      50           # mm/s
+extruder.hotend2.enable                       true           # Whether to activate the extruder module at all. All configuration is ignored if false
+extruder.hotend2.steps_per_mm                 88             # Steps per mm for extruder stepper
+extruder.hotend2.default_feed_rate            360            # Default rate ( mm/minute ) for moves where only the extruder moves
+extruder.hotend2.acceleration                 500            # Acceleration for the stepper motor, as of 0.6, arbitrary ratio
+extruder.hotend2.max_speed                    50             # mm/s
 
-extruder.hotend2.step_pin                       2.4          # Pin for extruder step signal
-extruder.hotend2.dir_pin                        4.29         # Pin for extruder dir signal ( add '!' to reverse direction )
-extruder.hotend2.en_pin                         1.8          # Pin for extruder enable signal
+extruder.hotend2.step_pin                     2.4            # Pin for extruder step signal
+extruder.hotend2.dir_pin                      4.29           # Pin for extruder dir signal ( add '!' to reverse direction )
+extruder.hotend2.en_pin                       1.8            # Pin for extruder enable signal
 
-extruder.hotend2.x_offset                       0            # x offset from origin in mm
-extruder.hotend2.y_offset                       0            # y offset from origin in mm
-extruder.hotend2.z_offset                       0            # z offset from origin in mm
+extruder.hotend2.x_offset                     0              # x offset from origin in mm
+extruder.hotend2.y_offset                     0              # y offset from origin in mm
+extruder.hotend2.z_offset                     0              # z offset from origin in mm
 
-#epsilon_current                                 1.5         # Second extruder stepper motor current
+#epsilon_current                              1.5            # Second extruder stepper motor current
 
-extruder.hotend3.enable                         true         # Whether to activate the extruder module at all. All configuration is ignored if false
-extruder.hotend3.steps_per_mm                   88           # Steps per mm for extruder stepper
-extruder.hotend3.default_feed_rate              360          # Default rate ( mm/minute ) for moves where only the extruder moves
-extruder.hotend3.acceleration                   500          # Acceleration for the stepper motor, as of 0.6, arbitrary ratio
-extruder.hotend3.max_speed                      50           # mm/s
+extruder.hotend3.enable                       true           # Whether to activate the extruder module at all. All configuration is ignored if false
+extruder.hotend3.steps_per_mm                 88             # Steps per mm for extruder stepper
+extruder.hotend3.default_feed_rate            360            # Default rate ( mm/minute ) for moves where only the extruder moves
+extruder.hotend3.acceleration                 500            # Acceleration for the stepper motor, as of 0.6, arbitrary ratio
+extruder.hotend3.max_speed                    50             # mm/s
 
-extruder.hotend3.step_pin                       1.26         # Pin for extruder step signal
-extruder.hotend3.dir_pin                        2.8          # Pin for extruder dir signal ( add '!' to reverse direction )
-extruder.hotend3.en_pin                         1.8          # Pin for extruder enable signal
+extruder.hotend3.step_pin                     1.26           # Pin for extruder step signal
+extruder.hotend3.dir_pin                      2.8            # Pin for extruder dir signal ( add '!' to reverse direction )
+extruder.hotend3.en_pin                       1.8            # Pin for extruder enable signal
 
-extruder.hotend3.x_offset                       0            # x offset from origin in mm
-extruder.hotend3.y_offset                       0            # y offset from origin in mm
-extruder.hotend3.z_offset                       0            # z offset from origin in mm
-
+extruder.hotend3.x_offset                     0              # x offset from origin in mm
+extruder.hotend3.y_offset                     0              # y offset from origin in mm
+extruder.hotend3.z_offset                     0              # z offset from origin in mm
 
 ## Laser module configuration
 # See http://smoothieware.org/laser
@@ -135,58 +134,58 @@ laser_module_pwm_pin                          2.5             # This pin will be
 # See http://smoothieware.org/temperaturecontrol
 
 # First hotend configuration
-temperature_control.hotend.enable              true           # Whether to activate this ( "hotend" ) module at all.
-temperature_control.hotend.thermistor_pin      0.26           # Pin for the thermistor to read
-temperature_control.hotend.heater_pin          2.5            # Pin that controls the heater, set to nc if a readonly thermistor is being defined
-temperature_control.hotend.thermistor          EPCOS100K      # See http://smoothieware.org/temperaturecontrol#toc5
-#temperature_control.hotend.beta               4066           # Or set the beta value
-temperature_control.hotend.set_m_code          104            # M-code to set the temperature for this module
+temperature_control.hotend.enable            true             # Whether to activate this ( "hotend" ) module at all.
+temperature_control.hotend.thermistor_pin    0.26             # Pin for the thermistor to read
+temperature_control.hotend.heater_pin        2.5              # Pin that controls the heater, set to nc if a readonly thermistor is being defined
+temperature_control.hotend.thermistor        EPCOS100K        # See http://smoothieware.org/temperaturecontrol#toc5
+#temperature_control.hotend.beta             4066             # Or set the beta value
+temperature_control.hotend.set_m_code        104              # M-code to set the temperature for this module
 temperature_control.hotend.set_and_wait_m_code 109            # M-code to set-and-wait for this module
-temperature_control.hotend.designator          T              # Designator letter for this module
-#temperature_control.hotend.max_temp           270            # Set maximum temperature - Will prevent heating above 300 by default
-#temperature_control.hotend.min_temp           10             # Set minimum temperature - Will prevent heating below if set
+temperature_control.hotend.designator        T                # Designator letter for this module
+#temperature_control.hotend.max_temp         270              # Set maximum temperature - Will prevent heating above 300 by default
+#temperature_control.hotend.min_temp         10               # Set minimum temperature - Will prevent heating below if set
 
 # Safety control is enabled by default and can be overidden here, the values show the defaults
 # See http://smoothieware.org/temperaturecontrol#runaway
 #temperature_control.hotend.runaway_heating_timeout      900  # How long it can take to heat up, max is 2040 seconds.
 #temperature_control.hotend.runaway_cooling_timeout      0    # How long it can take to cool down if temp is set lower, max is 2040 seconds
-#temperature_control.hotend.runaway_range                20   # How far from the set temperature it can wander, max setting is 63ï¿½C
+#temperature_control.hotend.runaway_range                20   # How far from the set temperature it can wander, max setting is 63°C
 
 # PID configuration 
 # See http://smoothieware.org/temperaturecontrol#pid
-temperature_control.hotend.p_factor         74.3              # P ( proportional ) factor
-temperature_control.hotend.i_factor         9.33              # I ( integral ) factor
-temperature_control.hotend.d_factor         148               # D ( derivative ) factor
+temperature_control.hotend.p_factor          74.3            # P ( proportional ) factor
+temperature_control.hotend.i_factor          9.33            # I ( integral ) factor
+temperature_control.hotend.d_factor          148             # D ( derivative ) factor
 
-temperature_control.hotend.max_pwm          250               # Max pwm, 64 is a good value if driving a 12v resistor with 24v.
+temperature_control.hotend.max_pwm           250             # Max pwm, 64 is a good value if driving a 12v resistor with 24v.
 
 # Second hotend configuration
-temperature_control.hotend2.enable              false         # Whether to activate this ( "hotend" ) module at all.
-temperature_control.hotend2.thermistor_pin      1.31          # Pin for the thermistor to read
-temperature_control.hotend2.heater_pin          2.7           # Pin that controls the heater
-temperature_control.hotend2.thermistor          EPCOS100K     # See http://smoothieware.org/temperaturecontrol#thermistor
-##temperature_control.hotend2.beta              4066          # or set the beta value
-temperature_control.hotend2.set_m_code          104           # M-code to set the temperature for this module
-temperature_control.hotend2.set_and_wait_m_code 109           # M-code to set-and-wait for this module
-temperature_control.hotend2.designator          T1              # Designator letter for this module
+temperature_control.hotend2.enable            true           # Whether to activate this ( "hotend" ) module at all.
+temperature_control.hotend2.thermistor_pin    1.31           # Pin for the thermistor to read
+temperature_control.hotend2.heater_pin        2.7            # Pin that controls the heater
+temperature_control.hotend2.thermistor        EPCOS100K      # See http://smoothieware.org/temperaturecontrol#thermistor
+#temperature_control.hotend2.beta             4066           # or set the beta value
+temperature_control.hotend2.set_m_code        104            # M-code to set the temperature for this module
+temperature_control.hotend2.set_and_wait_m_code 109          # M-code to set-and-wait for this module
+temperature_control.hotend2.designator        T1             # Designator letter for this module
 
-#temperature_control.hotend2.p_factor          13.7           # P ( proportional ) factor
-#temperature_control.hotend2.i_factor          0.097          # I ( integral ) factor
-#temperature_control.hotend2.d_factor          24             # D ( derivative ) factor
+#temperature_control.hotend2.p_factor         13.7           # P ( proportional ) factor
+#temperature_control.hotend2.i_factor         0.097          # I ( integral ) factor
+#temperature_control.hotend2.d_factor         24             # D ( derivative ) factor
 
-#temperature_control.hotend2.max_pwm           64             # Max pwm, 64 is a good value if driving a 12v resistor with 24v.
+#temperature_control.hotend2.max_pwm          64             # Max pwm, 64 is a good value if driving a 12v resistor with 24v.
 
 temperature_control.hotend3.enable            true           # Whether to activate this ( "hotend" ) module at all.
 temperature_control.hotend3.thermistor_pin    1.30           # Pin for the thermistor to read
 temperature_control.hotend3.heater_pin        1.20           # Pin that controls the heater
 temperature_control.hotend3.thermistor        EPCOS100K      # See http://smoothieware.org/temperaturecontrol#thermistor
-##temperature_control.hotend2.beta             4066           # or set the beta value
+##temperature_control.hotend2.beta            4066           # or set the beta value
 temperature_control.hotend3.set_m_code        104            # M-code to set the temperature for this module
 temperature_control.hotend3.set_and_wait_m_code 109          # M-code to set-and-wait for this module
 temperature_control.hotend3.designator        T2             # Designator letter for this module
 
 
-temperature_control.bed.enable               false            # Whether to activate this ( "hotend" ) module at all.
+temperature_control.bed.enable               true             # Whether to activate this ( "hotend" ) module at all.
 temperature_control.bed.thermistor_pin       0.25             # Pin for the thermistor to read
 temperature_control.bed.heater_pin           2.6              # Pin that controls the heater
 temperature_control.bed.thermistor           Honeywell100K    # See http://smoothieware.org/temperaturecontrol#thermistor
@@ -208,8 +207,8 @@ switch.fan.enable                            true             # Enable this modu
 switch.fan.input_on_command                  M106             # Command that will turn this switch on
 switch.fan.input_off_command                 M107             # Command that will turn this switch off
 switch.fan.output_pin                        1.24             # Pin this module controls
-switch.fan.output_type                       pwm              # PWM output settable with S parameter in the input_on_comand
-#switch.fan.max_pwm                          255              # Set max pwm for the pin default is 255
+switch.fan.output_type                       hwpwm            # PWM output settable with S parameter in the input_on_comand
+#switch.fan.max_pwm                          255              # Set max pwm for the pin when output_type=pwm, default is 255
 
 switch.misc.enable                           true             # Enable this module
 switch.misc.input_on_command                 M42              # Command that will turn this switch on
@@ -221,12 +220,12 @@ switch.misc.output_type                      digital          # Digital means th
 # See http://smoothieware.org/temperatureswitch
 # Automatically toggle a switch at a specified temperature. Different ones of these may be defined to monitor different temperatures and switch different swithxes
 # Useful to turn on a fan or water pump to cool the hotend
-#temperatureswitch.hotend.enable              true            #
-#temperatureswitch.hotend.designator          T               # first character of the temperature control designator to use as the temperature sensor to monitor
-#temperatureswitch.hotend.switch              misc            # select which switch to use, matches the name of the defined switch
-#temperatureswitch.hotend.threshold_temp      60.0            # temperature to turn on (if rising) or off the switch
-#temperatureswitch.hotend.heatup_poll         15              # poll heatup at 15 sec intervals
-#temperatureswitch.hotend.cooldown_poll       60              # poll cooldown at 60 sec intervals
+#temperatureswitch.hotend.enable             true             #
+#temperatureswitch.hotend.designator         T                # first character of the temperature control designator to use as the temperature sensor to monitor
+#temperatureswitch.hotend.switch             misc             # select which switch to use, matches the name of the defined switch
+#temperatureswitch.hotend.threshold_temp     60.0             # temperature to turn on (if rising) or off the switch
+#temperatureswitch.hotend.heatup_poll        15               # poll heatup at 15 sec intervals
+#temperatureswitch.hotend.cooldown_poll      60               # poll cooldown at 60 sec intervals
 
 ## Endstops
 # See http://smoothieware.org/endstops
@@ -249,9 +248,9 @@ beta_max_travel                              290              # Max travel in mm
 gamma_max_travel                             280              # Max travel in mm for gamma/Z axis when homing
 
 # Optional enable limit switches, actions will stop if any enabled limit switch is triggered
-alpha_limit_enable                          true              # Set to true to enable X min and max limit switches
-beta_limit_enable                           true              # Set to true to enable Y min and max limit switches
-gamma_limit_enable                          true              # Set to true to enable Z min and max limit switches
+alpha_limit_enable                           true             # Set to true to enable X min and max limit switches
+beta_limit_enable                            true             # Set to true to enable Y min and max limit switches
+gamma_limit_enable                           true             # Set to true to enable Z min and max limit switches
 
 # Endstops home at their fast feedrate first, then once the endstop is found they home again at their slow feedrate for accuracy
 alpha_fast_homing_rate_mm_s                  30               # Alpha/X fast homing feedrate in mm/second
@@ -279,13 +278,13 @@ move_to_origin_after_home                    false            # Move XY to 0,0 a
 
 ## Z-probe
 # See http://smoothieware.org/zprobe
-zprobe.enable                                false           # Set to true to enable a zprobe
-zprobe.probe_pin                             1.24            # Pin probe is attached to, if NC remove the !
-zprobe.slow_feedrate                         5               # Mm/sec probe feed rate
-#zprobe.debounce_count                       100             # Set if noisy
-zprobe.fast_feedrate                         100             # Move feedrate mm/sec
-zprobe.probe_height                          5               # How much above bed to start probe
-#gamma_min_endstop                           nc              # Normally 1.28. Change to nc to prevent conflict,
+zprobe.enable                                false            # Set to true to enable a zprobe
+zprobe.probe_pin                             1.24             # Pin probe is attached to, if NC remove the !
+zprobe.slow_feedrate                         5                # Mm/sec probe feed rate
+#zprobe.debounce_count                       100              # Set if noisy
+zprobe.fast_feedrate                         100              # Move feedrate mm/sec
+zprobe.probe_height                          5                # How much above bed to start probe
+#gamma_min_endstop                           nc               # Normally 1.28. Change to nc to prevent conflict,
 
 # Levelling strategy
 # Example for 3-point levelling strategy, see wiki documentation for other strategies
@@ -301,46 +300,38 @@ zprobe.probe_height                          5               # How much above be
 ## Panel
 # See http://smoothieware.org/panel
 # Please find your panel on the wiki and copy/paste the right configuration here
-panel.enable                                 true              # Set to true to enable the panel code
+panel.enable                                 true             # Set to true to enable the panel code
 
 # Example for TFTGLCDPanel
-panel.lcd                                   tft_glcd_panel
-panel.spi_channel                           0                  # SPI channel to use
-panel.spi_cs_pin                            0.16               # SPI chip select
-panel.buzz_pin                              nc                 # 1.22	# Pin for buzzer on main board or nc for buzzer on GLCD controller board
-panel.contrast                              250                # 0 - minimum, 255 - maximum
+panel.lcd                                    tft_glcd_panel
+panel.spi_channel                            0                # SPI channel to use
+panel.spi_cs_pin                             0.16             # SPI chip select
+panel.buzz_pin                               nc               # 1.22	# Pin for buzzer on main board or nc for buzzer on GLCD controller board
+panel.contrast                               250              # 0 - minimum, 255 - maximum
 
-panel.menu_offset                            0                 # Some panels will need 1 here
+panel.menu_offset                            0                # Some panels will need 1 here
 
-panel.alpha_jog_feedrate                     6000              # X jogging feedrate in mm/min
-panel.beta_jog_feedrate                      6000              # Y jogging feedrate in mm/min
-panel.gamma_jog_feedrate                     200               # Z jogging feedrate in mm/min
+panel.alpha_jog_feedrate                     6000             # X jogging feedrate in mm/min
+panel.beta_jog_feedrate                      6000             # Y jogging feedrate in mm/min
+panel.gamma_jog_feedrate                     200              # Z jogging feedrate in mm/min
 
-panel.hotend_temperature                     185               # Temp to set hotend when preheat is selected
-panel.bed_temperature                        60                # Temp to set bed when preheat is selected
+panel.hotend_temperature                     185              # Temp to set hotend when preheat is selected
+panel.bed_temperature                        60               # Temp to set bed when preheat is selected
 
 ## Custom menus : Example of a custom menu entry, which will show up in the Custom entry.
 # NOTE _ gets converted to space in the menu and commands, | is used to separate multiple commands
-custom_menu.power_on.enable                false
-custom_menu.power_on.name                  Power_on
-custom_menu.power_on.command               M80
+custom_menu.power_on.enable                  false
+custom_menu.power_on.name                    Power_on 
+custom_menu.power_on.command                 M80
 
-custom_menu.power_off.enable               false
-custom_menu.power_off.name                 Power_off
-custom_menu.power_off.command              M81
+custom_menu.power_off.enable                 false
+custom_menu.power_off.name                   Power_off
+custom_menu.power_off.command                M81
 
 
 ## Network settings
 # See http://smoothieware.org/network
-network.enable                                false              # Enable the ethernet network services
-network.webserver.enable                      false              # Enable the webserver
-network.telnet.enable                         false              # Enable the telnet server
-network.ip_address                            auto               # Use dhcp to get ip address
-# Uncomment the 3 below to manually setup ip  address
-#network.ip_address                           192.168.3.222      # The IP address
-#network.ip_mask                              255.255.255.0      # The ip mask
-#network.ip_gateway                           192.168.3.1        # The gateway address
-#network.mac_override                         xx.xx.xx.xx.xx.xx  # Override the mac address, only do this if you have a conflict
+network.enable                               false            # Enable the ethernet network services
 
 ## System configuration
 # Serial communications configuration ( baud rate defaults to 9600 if undefined )

@@ -1,22 +1,22 @@
 /*
- * TFTGLCDAdapter.cpp
+ * TFTGLCDPanel.h
  *
  *  Created on: 25-06-2019
  *      Author: Serhiy-K
  */
 
-#ifndef TFTGLCDAdapter_H_
-#define TFTGLCDAdapter_H_
+#ifndef TFTGLCDPanel_H_
+#define TFTGLCDPanel_H_
 
 #include "LcdBase.h"
 #include "mbed.h"
 #include "libs/Pin.h"
 
-class TFTGLCDAdapter: public LcdBase {
+class TFTGLCDPanel: public LcdBase {
 
 public:
-    TFTGLCDAdapter();
-    virtual ~TFTGLCDAdapter();
+    TFTGLCDPanel();
+    virtual ~TFTGLCDPanel();
     void init();
     void home();
     void clear();
@@ -69,4 +69,4 @@ private:
     uint16_t fan_percent = 0;
 };
 
-#endif /* TFTGLCDAdapter_H_ */
+#endif /* TFTGLCDPanel_H_ */

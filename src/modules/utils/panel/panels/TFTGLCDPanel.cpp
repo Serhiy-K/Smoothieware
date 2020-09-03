@@ -1,25 +1,25 @@
 /*
-* TFTGLCDAdapter.cpp
+* TFTGLCDPanel.cpp
 *
-* TFTGLCDAdapter is external adapter based on microcontroller.
-* TFTGLCDAdapter may use color TFT LCD with different chips and different resolutions.
+* TFTGLCDPanel is external panel based on microcontroller.
+* TFTGLCDPanel may use color TFT LCD with different chips and different resolutions.
 * Courently it built on STM32F103C8T6 "Blue Pill" board and may use color TFT LCDs based on
 * ILI9325 and ILI9341 with resolution 320x240 and ILI9327 with resolution 400x240.
-* If adapter use font dimension 16x24 and LCD has resolution 320x240 then screen has text
+* If panel use font dimension 16x24 and LCD has resolution 320x240 then screen has text
 * resolution 20x10 and with LCD resolution 400x240 text resolution will be 25x10.
-* TFTGLCDAdapter uses text screen buffer insted off graphical buffer for other panels.
-* TFTGLCDAdapter has own encoder and may have up to 6 buttons (include encoder button).
+* TFTGLCDPanel uses text screen buffer insted off graphical buffer for other panels.
+* TFTGLCDPanel has own encoder and may have up to 6 buttons (include encoder button).
 *
-* For use TFTGLCDAdapter you need set "panel.enable" parameter in config file to "true",
-* change "panel.lcd" parameter to "tft_glcd_adapter" and set proper parameters for SPI bus.
+* For use TFTGLCDPanel you need set "panel.enable" parameter in config file to "true",
+* change "panel.lcd" parameter to "tft_glcd_panel" and set proper parameters for SPI bus.
 *
-* Hardware and firmware sources for TFTGLCDAdapter: https://github.com/Serhiy-K/TFTGLCDAdapter.git
+* Hardware and firmware sources for TFTGLCDPanel: https://github.com/Serhiy-K/TFTGLCDPanel.git
 *
 *  Created on: 25-06-2019
 *      Author: Serhiy-K
 */
 
-#include "TFTGLCDAdapter.h"
+#include "TFTGLCDPanel.h"
 
 #include "Kernel.h"
 #include "platform_memory.h"
@@ -40,21 +40,20 @@ enum Commands {
     GET_SPI_DATA = 0,
     READ_BUTTONS,       // read buttons
     READ_ENCODER,       // read encoder
-    LCD_WRITE,          // write to LCD
+    LCD_WRITE,          // write all buffer to panel
     BUZZER,             // beep buzzer
     CONTRAST,           // set contrast
     // Other commands... 0xE0 thru 0xFF
-    GET_LCD_ROW = 0xE0, // read LCD rows number from adapter
-    GET_LCD_COL,        // read LCD columns number from adapter
-    CLEAR_BUFFER,       // for Marlin
-    REDRAW,             // for Marlin
-    INIT_ADAPTER = 0xFE,// Initialize
+    GET_LCD_ROW = 0xE0, // read number of LCD rows from panel
+    GET_LCD_COL,        // read number of LCD columns from panel
+    LCD_PUT,		    // send one line, used in Marlin
+    INIT_PANEL = 0xFE,  // Initialize
 };
 
 #define LED_MASK    0x0f
 #define PIC_MASK    0x3f
 
-TFTGLCDAdapter::TFTGLCDAdapter() {
+TFTGLCDPanel::TFTGLCDPanel() {
     // select which SPI channel to use
     int spi_channel = THEKERNEL->config->value(panel_checksum, spi_channel_checksum)->by_default(0)->as_number();
     PinName mosi, miso, sclk;
@@ -82,17 +81,17 @@ TFTGLCDAdapter::TFTGLCDAdapter() {
             THEKERNEL->streams->printf("Not enough memory available for frame buffer");
     }
     else
-        THEKERNEL->streams->printf("TFT GLCD Adapter not connected");
+        THEKERNEL->streams->printf("TFT GLCD Panel not connected");
 }
 
-TFTGLCDAdapter::~TFTGLCDAdapter() {
+TFTGLCDPanel::~TFTGLCDPanel() {
     this->cs.set(1);
     delete this->spi;
     if (framebuffer)
         AHB0.dealloc(framebuffer);
 }
-//get screen resolution from adapter and calculate framebuffer size
-void TFTGLCDAdapter::detect_panel() {
+//get screen resolution from panel and calculate framebuffer size
+void TFTGLCDPanel::detect_panel() {
     this->cs.set(0);
     this->spi->write(GET_LCD_ROW);
     text_lines = this->spi->write(GET_SPI_DATA);
@@ -109,41 +108,41 @@ void TFTGLCDAdapter::detect_panel() {
     panel_present = 1;  //screen resolution >= 20x10
 }
 //clearing screen
-void TFTGLCDAdapter::clear() {
+void TFTGLCDPanel::clear() {
     if (!panel_present) return;
     memset(framebuffer, ' ', fbsize - 2);
     framebuffer[fbsize - 2] = framebuffer[fbsize - 1] = 0;
     tx = ty = picBits = gliph_update_cnt = 0;
 }
 //set new text cursor position
-void TFTGLCDAdapter::setCursor(uint8_t col, uint8_t row) {
+void TFTGLCDPanel::setCursor(uint8_t col, uint8_t row) {
     tx = col;
     ty = row;
 }
 // set text cursor to uper left corner
-void TFTGLCDAdapter::home() {
+void TFTGLCDPanel::home() {
     tx = ty = 0;
 }
-//Init adapter
-void TFTGLCDAdapter::init() {
+//Init panel
+void TFTGLCDPanel::init() {
     if (!panel_present) return;
     this->cs.set(0);
-    this->spi->write(INIT_ADAPTER);
+    this->spi->write(INIT_PANEL);
     this->spi->write(0);    //protocol = Smoothie
     wait_us(10);
     this->cs.set(1);
-    // give adapter time to init
+    // give panel time to init
     safe_delay_ms(100);
 }
 //send text line to buffer
-void TFTGLCDAdapter::write(const char *line, int len) {
+void TFTGLCDPanel::write(const char *line, int len) {
     uint8_t pos;
     if (!panel_present) return;
     pos = tx + ty * chars_per_line;
     for (int i = 0; i < len; ++i) framebuffer[pos++] = line[i];
 }
 //send all screen and flags for icons and leds
-void TFTGLCDAdapter::send_pic(const unsigned char *fbstart) {
+void TFTGLCDPanel::send_pic(const unsigned char *fbstart) {
     framebuffer[fbsize - 2] = picBits & PIC_MASK;
     framebuffer[fbsize - 1] = ledBits & LED_MASK;
     if (gliph_update_cnt) gliph_update_cnt--;
@@ -152,7 +151,7 @@ void TFTGLCDAdapter::send_pic(const unsigned char *fbstart) {
         framebuffer[chars_per_line * 4] = '%';
         framebuffer[chars_per_line * 4 + 1] = (uint8_t)fan_percent;
     }
-    //send framebuffer to adapter
+    //send framebuffer to panel
     this->cs.set(0);
     this->spi->write(LCD_WRITE);
     for (int x = 0; x < fbsize; x++) {
@@ -162,7 +161,7 @@ void TFTGLCDAdapter::send_pic(const unsigned char *fbstart) {
     this->cs.set(1);
 }
 //refreshing screen with 10Hz refresh rate
-void TFTGLCDAdapter::on_refresh(bool now) {
+void TFTGLCDPanel::on_refresh(bool now) {
     if (!panel_present) return;
     refresh_counts++;
     if (now || (refresh_counts == 2)) {
@@ -171,7 +170,7 @@ void TFTGLCDAdapter::on_refresh(bool now) {
     }
 }
 //set flags for icons
-void TFTGLCDAdapter::bltGlyph(int x, int y, int w, int h, const uint8_t *glyph, int span, int x_offset, int y_offset) {
+void TFTGLCDPanel::bltGlyph(int x, int y, int w, int h, const uint8_t *glyph, int span, int x_offset, int y_offset) {
     if (w == 80)
         picBits = 0x01;    //draw logo
     else {
@@ -187,7 +186,7 @@ void TFTGLCDAdapter::bltGlyph(int x, int y, int w, int h, const uint8_t *glyph, 
     }
 }
 // Sets flags for leds
-void TFTGLCDAdapter::setLed(int led, bool onoff) {
+void TFTGLCDPanel::setLed(int led, bool onoff) {
     if(onoff) {
         switch(led) {
             case LED_HOTEND_ON: ledBits |= 1; break; // on
@@ -205,7 +204,7 @@ void TFTGLCDAdapter::setLed(int led, bool onoff) {
     }
 }
 // cycle the buzzer pin at a certain frequency (hz) for a certain duration (ms)
-void TFTGLCDAdapter::buzz(long duration, uint16_t freq) {
+void TFTGLCDPanel::buzz(long duration, uint16_t freq) {
     if (this->buzz_pin.connected()) { //buzzer on Smoothie main board
         duration *= 1000;             //convert from ms to us
         long period = 1000000 / freq; // period in us
@@ -229,7 +228,7 @@ void TFTGLCDAdapter::buzz(long duration, uint16_t freq) {
     }
 }
 //reading button state
-uint8_t TFTGLCDAdapter::readButtons(void) {
+uint8_t TFTGLCDPanel::readButtons(void) {
     if (!panel_present) return 0;
     this->cs.set(0);
     this->spi->write(READ_BUTTONS);
@@ -240,7 +239,7 @@ uint8_t TFTGLCDAdapter::readButtons(void) {
     return b;
 }
 
-int TFTGLCDAdapter::readEncoderDelta() {
+int TFTGLCDPanel::readEncoderDelta() {
     if (!panel_present) return 0;
     this->cs.set(0);
     this->spi->write(READ_ENCODER);
@@ -252,7 +251,7 @@ int TFTGLCDAdapter::readEncoderDelta() {
     return d;
 }
 
-void TFTGLCDAdapter::setContrast(uint8_t c) {
+void TFTGLCDPanel::setContrast(uint8_t c) {
     contrast = c;
     if (!panel_present) return;
     this->cs.set(0);
