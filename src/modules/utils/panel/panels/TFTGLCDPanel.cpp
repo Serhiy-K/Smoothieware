@@ -46,7 +46,8 @@ enum Commands {
     // Other commands... 0xE0 thru 0xFF
     GET_LCD_ROW = 0xE0, // read number of LCD rows from panel
     GET_LCD_COL,        // read number of LCD columns from panel
-    LCD_PUT,		    // send one line, used in Marlin
+    LCD_PUT,            // send one line, used in Marlin
+    CLR_SCREEN,         // may be used in Marlin
     INIT_PANEL = 0xFE,  // Initialize
 };
 
